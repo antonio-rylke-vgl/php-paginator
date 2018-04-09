@@ -12,6 +12,7 @@ class Paginator
     protected $currentPage;
     protected $urlPattern;
     protected $maxPagesToShow = 10;
+    protected $skipFirstPage;
     protected $previousText = 'Previous';
     protected $nextText = 'Next';
 
@@ -20,13 +21,15 @@ class Paginator
      * @param int $itemsPerPage The number of items per page.
      * @param int $currentPage The current page number.
      * @param string $urlPattern A URL for each page, with (:num) as a placeholder for the page number. Ex. '/foo/page/(:num)'
+     * @param bool $skipFirstPage Show url of first page without number. Ex. /foo/page/1 becomes /foo/page/
      */
-    public function __construct($totalItems, $itemsPerPage, $currentPage, $urlPattern = '')
+    public function __construct($totalItems, $itemsPerPage, $currentPage, $urlPattern = '', $skipFirstPage = false)
     {
         $this->totalItems = $totalItems;
         $this->itemsPerPage = $itemsPerPage;
         $this->currentPage = $currentPage;
         $this->urlPattern = $urlPattern;
+       $this->skipFirstPage = $skipFirstPage;
 
         $this->updateNumPages();
     }
@@ -136,6 +139,10 @@ class Paginator
      */
     public function getPageUrl($pageNum)
     {
+        if($pageNum == 1  && $this->skipFirstPage) {
+            $pageNum = '';
+        }
+
         return str_replace(self::NUM_PLACEHOLDER, $pageNum, $this->urlPattern);
     }
 
@@ -245,7 +252,7 @@ class Paginator
      *
      * @param int $pageNum
      * @param bool $isCurrent
-     * @return Array
+     * @return array
      */
     protected function createPage($pageNum, $isCurrent = false)
     {
